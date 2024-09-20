@@ -1,5 +1,4 @@
 import { createSlice } from "@reduxjs/toolkit";
-
 const initialState = JSON.parse(localStorage.getItem("kanbanState")) || {
   name: "Kanban Board",
   columns: [
@@ -67,13 +66,9 @@ const initialState = JSON.parse(localStorage.getItem("kanbanState")) || {
     },
   ],
 };
-
-
-
 const saveToLocalStorage = (state) => {
   localStorage.setItem("kanbanState", JSON.stringify(state));
 };
-
 const boardsSlice = createSlice({
   name: "boards",
   initialState,
@@ -94,7 +89,7 @@ const boardsSlice = createSlice({
         description,
         dueDate,
       });
-      saveToLocalStorage(state); 
+      saveToLocalStorage(state);
     },
     editTask: (state, action) => {
       const { title, description, dueDate, colIndex, taskIndex } = action.payload;
@@ -102,7 +97,7 @@ const boardsSlice = createSlice({
       task.title = title;
       task.description = description;
       task.dueDate = dueDate;
-      saveToLocalStorage(state); 
+      saveToLocalStorage(state);
     },
     deleteTask: (state, action) => {
       const { colIndex, taskIndex } = action.payload;
@@ -115,12 +110,17 @@ const boardsSlice = createSlice({
       state.columns[colIndex].tasks.push(task);
       saveToLocalStorage(state);
     },
+    reorderTaskInColumn: (state, action) => {
+      const { colIndex, sourceIndex, destinationIndex } = action.payload;
+      const column = state.columns[colIndex];
+      const [movedTask] = column.tasks.splice(sourceIndex, 1);
+      column.tasks.splice(destinationIndex, 0, movedTask);
+    },
   },
 });
-
-
 export const {
   loadFromLocalStorage,
+  reorderTaskInColumn,
   addTask,
   editTask,
   deleteTask,

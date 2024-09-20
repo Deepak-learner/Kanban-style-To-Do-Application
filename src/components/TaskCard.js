@@ -5,42 +5,30 @@ import { deleteTask } from "../redux/boardsSlice";
 import { ReactComponent as EditIcon } from "../assets/images/edit.svg";
 import { ReactComponent as DeleteIcon } from "../assets/images/delete.svg";
 import DeleteConfirmationModal from "../modals/DeleteConfirmationModal";
-
-const TaskCard = ({ colIndex, taskIndex }) => {
+const TaskCard = ({ colIndex, taskIndex, dataIndex, onDragStart }) => {
   const dispatch = useDispatch();
   const boards = useSelector((state) => state.boards);
   const col = boards?.columns?.[colIndex];
   const task = col?.tasks?.[taskIndex];
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-
   if (!task) return null;
-
-  const handleOnDrag = (e) => {
-    e.dataTransfer.setData(
-      "text",
-      JSON.stringify({ taskIndex, prevColIndex: colIndex })
-    );
-  };
-
   const handleDelete = (e) => {
     e.stopPropagation();
     setIsDeleteModalOpen(true);
   };
-
   const confirmDelete = () => {
     dispatch(deleteTask({ colIndex, taskIndex }));
     setIsDeleteModalOpen(false);
   };
-
   const isOverdue = task.dueDate && new Date(task.dueDate) < new Date();
-
   return (
     <div>
       <div
         onClick={() => setIsTaskModalOpen(true)}
         draggable
-        onDragStart={handleOnDrag}
+        onDragStart={onDragStart}
+        data-index={dataIndex}
         className={`bg-white p-4 rounded-md shadow-lg cursor-pointer hover:bg-gray-50 ${
           isOverdue ? "border-2 border-red-500" : ""
         }`}
@@ -89,5 +77,4 @@ const TaskCard = ({ colIndex, taskIndex }) => {
     </div>
   );
 };
-
 export default TaskCard;
